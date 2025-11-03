@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const { generateAccessToken, generateRefreshToken } = require("../utils/generateTokens");
 
-// ✅ Validation Schemas
+
 const registerSchema = Joi.object({
   username: Joi.string().min(3).required(),
   password: Joi.string().min(6).required(),
@@ -16,7 +16,6 @@ const loginSchema = Joi.object({
   password: Joi.string().required()
 });
 
-// ✅ Signup
 const registerUser = asyncHandler(async (req, res) => {
   const { error } = registerSchema.validate(req.body);
   if (error) throw new Error(error.details[0].message);
@@ -29,8 +28,6 @@ const registerUser = asyncHandler(async (req, res) => {
   res.status(201).json({ success: true, message: "User registered successfully" });
 });
 
-// ✅ Login
-// ✅ Login
 const loginUser = asyncHandler(async (req, res) => {
     const { error } = loginSchema.validate(req.body);
     if (error) throw new Error(error.details[0].message);
@@ -45,8 +42,7 @@ const loginUser = asyncHandler(async (req, res) => {
   
     user.refreshToken = refreshToken;
     await user.save();
-  
-    // Send both cookies and tokens in response
+     
     res
       .cookie("accessToken", accessToken, {
         httpOnly: true,
@@ -62,13 +58,11 @@ const loginUser = asyncHandler(async (req, res) => {
         success: true,
         message: "Login successful",
         role: user.role,
-        accessToken,      // 👈 included for Postman visibility
-        refreshToken,     // 👈 included for Postman visibility
-      });
+        accessToken,    
+        refreshToken,     
+      })  
   });
   
-
-// ✅ Refresh Access Token
 const refreshAccessToken = asyncHandler(async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) throw new Error("No refresh token found");
@@ -89,7 +83,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         .json({
           success: true,
           message: "Access token refreshed",
-          accessToken: newAccessToken, // 👈 return token explicitly
+          accessToken: newAccessToken, 
         });
     } catch {
       throw new Error("Refresh token expired or invalid");
@@ -97,7 +91,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   });
   
 
-// ✅ Logout
+
 const logoutUser = asyncHandler(async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) throw new Error("Not logged in");
@@ -112,7 +106,7 @@ const logoutUser = asyncHandler(async (req, res) => {
      .json({ success: true, message: "Logged out successfully" });
 });
 
-// ✅ Protected Admin Data
+
 const getData = asyncHandler(async (req, res) => {
   res.json({ success: true, data: "Confidential admin data only" });
 });
